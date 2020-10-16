@@ -5,16 +5,27 @@ function times(times: number, fn: (time: number) => void) {
   }
 }
 
+function perf<T>(name: string, fn: (timeStamp: () => void) => T) {
+  console.time(name);
+  const erg = fn(() => console.timeLog(name));
+  console.timeEnd(name);
+  return erg;
+}
+
 const grid = document.getElementById('grid');
 
-const resolution = 150;
+const resolution = 200;
+
+const zoom = 2;
+
+const offset = { x: -.5 - zoom * .5, y: 0 - zoom * .5 };
 
 grid.setAttribute('style', `
   grid-template-columns: repeat(${resolution}, 1fr);
   grid-template-rows: repeat(${resolution}, 1fr);
 `);
 
-times(resolution * resolution, () => grid.appendChild(document.createElement('div')));
+perf('create Children', () => times(resolution * resolution, () => grid.appendChild(document.createElement('div'))));
 
 type RGBValue = [r: number, g: number, b: number];
 
@@ -76,19 +87,23 @@ function mandelbrot(t: Complex) {
     return fn(depth + 1, c, add(square(curr), c));
   }
 
-  const erg = fn(0, t);
-  return erg;
+  return fn(0, t);
 }
 
 const children = grid.children;
-times(children.length, (i) => {
-  const child = children[i];
-  const x = i % resolution;
-  const y = Math.floor(i / resolution);
+perf('mandelbrot', () => {
 
-  const val = mandelbrot({ r: ((x / resolution) * 2) - 1.5, i: ((y / resolution) * 2) - 1 });
-
-  const [r, g, b] = getRGBFromPercentage(val / rgbdiff);
-  const color = `rgb(${r}, ${g}, ${b})`;
-  child.setAttribute('style', `background-color: ${color}`);
+  times(children.length, (i) => {
+    const child = children[i];
+    const x = i % resolution;
+    const prevY = Math.floor((i - 1) / resolution);
+    const y = Math.floor(i / resolution);
+  
+    const val = mandelbrot({ r: ((x / resolution) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
+  
+    const [r, g, b] = getRGBFromPercentage(val / rgbdiff);
+    const color = `rgb(${r}, ${g}, ${b})`;
+    child.setAttribute('style', `background-color: ${color}`);
+  });
+  
 });
