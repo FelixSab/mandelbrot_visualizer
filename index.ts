@@ -7,7 +7,14 @@ function times(times: number, fn: (time: number) => void) {
 
 const grid = document.getElementById('grid');
 
-times(10000, () => grid.appendChild(document.createElement('div')));
+const resolution = 150;
+
+grid.setAttribute('style', `
+  grid-template-columns: repeat(${resolution}, 1fr);
+  grid-template-rows: repeat(${resolution}, 1fr);
+`);
+
+times(resolution * resolution, () => grid.appendChild(document.createElement('div')));
 
 type RGBValue = [r: number, g: number, b: number];
 
@@ -76,10 +83,10 @@ function mandelbrot(t: Complex) {
 const children = grid.children;
 times(children.length, (i) => {
   const child = children[i];
-  const x = i % 100;
-  const y = Math.floor(i / 100);
+  const x = i % resolution;
+  const y = Math.floor(i / resolution);
 
-  const val = mandelbrot({ r: ((x / 100) * 2) - 1.5, i: ((y / 100) * 2) - 1 });
+  const val = mandelbrot({ r: ((x / resolution) * 2) - 1.5, i: ((y / resolution) * 2) - 1 });
 
   const [r, g, b] = getRGBFromPercentage(val / rgbdiff);
   const color = `rgb(${r}, ${g}, ${b})`;
