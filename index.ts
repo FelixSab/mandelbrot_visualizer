@@ -12,20 +12,13 @@ function perf<T>(name: string, fn: (timeStamp: () => void) => T) {
   return erg;
 }
 
-const grid = document.getElementById('grid');
+const grid = document.getElementById('grid') as HTMLCanvasElement;
 
 const resolution = 400;
 
 const zoom = 2;
 
 const offset = { x: -.5 - zoom * .5, y: 0 - zoom * .5 };
-
-grid.setAttribute('style', `
-  grid-template-columns: repeat(${resolution}, 1fr);
-  grid-template-rows: repeat(${resolution}, 1fr);
-`);
-
-times(resolution * resolution, () => grid.appendChild(document.createElement('div')));
 
 type RGBValue = [r: number, g: number, b: number];
 
@@ -91,27 +84,29 @@ function mandelbrot(t: Complex) {
   return fn(0, t);
 }
 
-async function generateGrid() {
-  const children = grid.children;
-  const colors = await new Promise<string[]>((resolve) => {
-    const colors = [];
-    times(children.length, (i) => {
-      const x = i % resolution;
-      const y = Math.floor(i / resolution);
-    
-      const val = mandelbrot({ r: ((x / resolution) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
-    
-      const [r, g, b] = getRGBFromPercentage(val / colorDepth);
-      const color = `rgb(${r}, ${g}, ${b})`;
-      colors.push(color);
-    });
+function generateGrid() {
+  const ctx = grid.getContext('2d') as CanvasRenderingContext2D;
+  console.log({ grid, ctx })
+  const imgData = ctx.createImageData(resolution, resolution);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const res = resolution * 4;
+    const x = i % res;
+    const y = Math.floor(i / res);
+  
+    const val = mandelbrot({ r: ((x / res) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
+  
+    const [r, g, b] = getRGBFromPercentage(val / colorDepth);
+    imgData.data[i+0] = r;
+    imgData.data[i+1] = g;
+    imgData.data[i+2] = b;
+    imgData.data[i+3] = 255;
+  }
 
-    resolve(colors);
-  });
-
-  colors.forEach((color, index) => {
-    children[index].setAttribute('style', `background-color: ${color}`);
-  })
+  ctx.putImageData(imgData, 0, 0);
 }
 
-perf('generate-grid', generateGrid);
+function main() {
+  perf('generate-grid', generateGrid);
+}
+
+window.onload = main;
