@@ -13,8 +13,14 @@ function perf<T>(name: string, fn: (timeStamp: () => void) => T) {
 }
 
 const grid = document.getElementById('grid') as HTMLCanvasElement;
+const container = document.getElementById('container');
+const gridLength = container.clientWidth;
+const resolution = 800;
+grid.setAttribute('width', `${resolution}`);
+grid.setAttribute('height', `${resolution}`);
 
-const resolution = 400;
+const scale = gridLength / resolution;
+
 
 const zoom = 2;
 
@@ -92,9 +98,9 @@ function generateGrid() {
     const res = resolution * 4;
     const x = i % res;
     const y = Math.floor(i / res);
-  
+    
     const val = mandelbrot({ r: ((x / res) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
-  
+    
     const [r, g, b] = getRGBFromPercentage(val / colorDepth);
     imgData.data[i+0] = r;
     imgData.data[i+1] = g;
@@ -102,6 +108,7 @@ function generateGrid() {
     imgData.data[i+3] = 255;
   }
 
+  grid.setAttribute('style', `transform: translate(-50%, -50%) scale(${scale})`);
   ctx.putImageData(imgData, 0, 0);
 }
 
