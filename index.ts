@@ -14,7 +14,7 @@ function perf<T>(name: string, fn: (timeStamp: () => void) => T) {
 
 const grid = document.getElementById('grid');
 
-const resolution = 200;
+const resolution = 400;
 
 const zoom = 2;
 
@@ -25,7 +25,7 @@ grid.setAttribute('style', `
   grid-template-rows: repeat(${resolution}, 1fr);
 `);
 
-perf('create Children', () => times(resolution * resolution, () => grid.appendChild(document.createElement('div'))));
+times(resolution * resolution, () => grid.appendChild(document.createElement('div')));
 
 type RGBValue = [r: number, g: number, b: number];
 
@@ -46,6 +46,7 @@ const colors = [
 ];
 
 const rgbdiff = 255 * 5;
+const colorDepth = Math.floor(rgbdiff / 10);
 
 function getRGBFromPercentage(percentage: number): RGBValue {
   const stepsAmount = Math.floor(percentage * rgbdiff);
@@ -83,27 +84,34 @@ function square(c: Complex): Complex {
 function mandelbrot(t: Complex) {
   const fn = (depth: number, c: Complex, curr = { r: 0, i: 0 }) => {
     if (curr.r >= 2 || curr.r <= -2) return depth;
-    if (depth === rgbdiff) return depth;
+    if (depth === colorDepth) return depth;
     return fn(depth + 1, c, add(square(curr), c));
   }
 
   return fn(0, t);
 }
 
-const children = grid.children;
-perf('mandelbrot', () => {
+async function generateGrid() {
+  const children = grid.children;
+  const colors = await new Promise<string[]>((resolve) => {
+    const colors = [];
+    times(children.length, (i) => {
+      const x = i % resolution;
+      const y = Math.floor(i / resolution);
+    
+      const val = mandelbrot({ r: ((x / resolution) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
+    
+      const [r, g, b] = getRGBFromPercentage(val / colorDepth);
+      const color = `rgb(${r}, ${g}, ${b})`;
+      colors.push(color);
+    });
 
-  times(children.length, (i) => {
-    const child = children[i];
-    const x = i % resolution;
-    const prevY = Math.floor((i - 1) / resolution);
-    const y = Math.floor(i / resolution);
-  
-    const val = mandelbrot({ r: ((x / resolution) * zoom) + offset.x, i: ((y / resolution) * zoom) + offset.y });
-  
-    const [r, g, b] = getRGBFromPercentage(val / rgbdiff);
-    const color = `rgb(${r}, ${g}, ${b})`;
-    child.setAttribute('style', `background-color: ${color}`);
+    resolve(colors);
   });
-  
-});
+
+  colors.forEach((color, index) => {
+    children[index].setAttribute('style', `background-color: ${color}`);
+  })
+}
+
+perf('generate-grid', generateGrid);
