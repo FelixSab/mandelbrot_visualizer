@@ -1,7 +1,7 @@
 import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb.js';
 import { mandelbrot, perf } from './utils.js';
 import { resolution } from './config.js';
-import { getComplex, initialCanvas } from './canvas.js';
+import { getComplex, initialCanvas, Canvas, zoomOnPosition } from './canvas.js';
 
 function initGrid(container: HTMLElement) {
   const grid = document.getElementById('grid') as HTMLCanvasElement;
@@ -34,15 +34,27 @@ function main() {
   const container = document.getElementById('container');
   const generateImage = initGrid(container);
 
-  function generateGrid() {
+  function generateGrid(canvas: Canvas) {
     generateImage((x, y) => {
-      const coord = getComplex(initialCanvas, x, y);
+      const coord = getComplex(canvas, x, y);
       const val = mandelbrot(coord);
       return getRGBFromPercentage(val / colorDepth);
     });
   }
 
-  perf('generate-grid', () => generateGrid());
+  container.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    
+    const canvas = zoomOnPosition(2, initialCanvas, e.offsetX, e.offsetY, container);
+    generateGrid(canvas);
+  });
+
+  container.addEventListener('click', ({ offsetX, offsetY }) => {
+    const canvas = zoomOnPosition(.5, initialCanvas, offsetX, offsetY, container);
+    generateGrid(canvas);
+  });
+
+  perf('generate-grid', () => generateGrid(initialCanvas));
 }
 
 window.onload = main;
