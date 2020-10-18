@@ -1,7 +1,7 @@
 import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb.js';
 import { mandelbrot, perf } from './utils.js';
-
-const resolution = 512;
+import { resolution } from './config.js';
+import { getComplex, initialCanvas } from './canvas.js';
 
 function initGrid(container: HTMLElement) {
   const grid = document.getElementById('grid') as HTMLCanvasElement;
@@ -12,7 +12,7 @@ function initGrid(container: HTMLElement) {
   const scale = gridLength / resolution;
   grid.setAttribute('style', `transform: translate(-50%, -50%) scale(${scale})`);
 
-  return (callback: (x: number, y: number) => RGBValue) => {
+  return (callback: (xIndex: number, yIndex: number) => RGBValue) => {
     const imgData = ctx.createImageData(resolution, resolution);
     for (let i = 0; i < imgData.data.length; i += 4) {
       const x = (i % (resolution * 4)) / 4;
@@ -34,18 +34,15 @@ function main() {
   const container = document.getElementById('container');
   const generateImage = initGrid(container);
 
-  const zoom = 2;
-  const offset = { x: -.5 - zoom * .5, y: 0 - zoom * .5 };
-
-  function generateGrid(zoom: number, offset: { x: number; y: number; }) {
+  function generateGrid() {
     generateImage((x, y) => {
-      const val = mandelbrot({ r: ((x / (resolution)) * zoom) + offset.x, i: ((y / (resolution)) * zoom) + offset.y });
-
+      const coord = getComplex(initialCanvas, x, y);
+      const val = mandelbrot(coord);
       return getRGBFromPercentage(val / colorDepth);
     });
   }
 
-  perf('generate-grid', () => generateGrid(zoom, offset));
+  perf('generate-grid', () => generateGrid());
 }
 
 window.onload = main;
