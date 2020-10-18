@@ -1,4 +1,4 @@
-import { colorDepth } from './rgb.js';
+import { colorDepth } from './rgb';
 
 export function perf<T>(name: string, fn: (timeStamp: () => void) => T) {
   console.time(name);
@@ -25,7 +25,7 @@ function square(c: Complex): Complex {
 }
 
 export function mandelbrot(t: Complex) {
-  const fn = (depth: number, c: Complex, curr = { r: 0, i: 0 }) => {
+  const fn = (depth: number, c: Complex, curr = { r: 0, i: 0 }): number => {
     if (curr.r >= 2 || curr.r <= -2) return depth;
     if (depth === colorDepth) return depth;
     return fn(depth + 1, c, add(square(curr), c));

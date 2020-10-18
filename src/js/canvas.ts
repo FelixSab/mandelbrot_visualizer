@@ -1,5 +1,5 @@
-import { resolution } from './config.js';
-import { Complex } from './utils.js';
+import { resolution } from './config';
+import { Complex } from './utils';
 
 export interface Canvas {
   topLeft: { r: number, i: number },

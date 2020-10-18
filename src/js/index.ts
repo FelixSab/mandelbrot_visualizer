@@ -1,7 +1,8 @@
-import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb.js';
-import { mandelbrot, perf } from './utils.js';
-import { resolution } from './config.js';
-import { getComplex, initialCanvas, Canvas, zoomOnPosition } from './canvas.js';
+import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb';
+import { mandelbrot, perf } from './utils';
+import { resolution } from './config';
+import { getComplex, initialCanvas, Canvas, zoomOnPosition } from './canvas';
+import '../sass/main.sass';
 
 function initGrid(container: HTMLElement) {
   const grid = document.getElementById('grid') as HTMLCanvasElement;
