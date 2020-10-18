@@ -38,8 +38,8 @@ export function zoomOnPosition(zoom: number, canvas: Canvas, x: number, y: numbe
   return {
     length,
     topLeft: {
-      r: position.r - (offsetXPercentage),
-      i: position.i - (offsetYPercentage)
+      r: position.r - (offsetXPercentage * length),
+      i: position.i - (offsetYPercentage * length)
     },
     resolution
   };

@@ -33,6 +33,7 @@ function initGrid(container: HTMLElement) {
 function main() {
   const container = document.getElementById('container');
   const generateImage = initGrid(container);
+  let canvas = initialCanvas;
 
   function generateGrid(canvas: Canvas) {
     generateImage((x, y) => {
@@ -44,13 +45,12 @@ function main() {
 
   container.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    
-    const canvas = zoomOnPosition(2, initialCanvas, e.offsetX, e.offsetY, container);
+    canvas = zoomOnPosition(2, canvas, e.offsetX, e.offsetY, container);
     generateGrid(canvas);
   });
 
   container.addEventListener('click', ({ offsetX, offsetY }) => {
-    const canvas = zoomOnPosition(.5, initialCanvas, offsetX, offsetY, container);
+    canvas = zoomOnPosition(.5, canvas, offsetX, offsetY, container);
     generateGrid(canvas);
   });
 
