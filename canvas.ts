@@ -34,7 +34,7 @@ export function zoomOnPosition(zoom: number, canvas: Canvas, x: number, y: numbe
   const length = canvas.length * zoom;
   const offsetXPercentage = (position.r - canvas.topLeft.r) / canvas.length;
   const offsetYPercentage = (position.i - canvas.topLeft.i) / canvas.length;
-  console.log({ offsetXPercentage, offsetYPercentage, length });
+
   return {
     length,
     topLeft: {
