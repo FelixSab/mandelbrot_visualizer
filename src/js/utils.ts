@@ -26,10 +26,11 @@ function square(c: Complex): Complex {
 
 export function mandelbrot(t: Complex) {
   let curr = { r: 0, i: 0 };
-  for (let depth = 0; depth <= colorDepth; depth++) {
-    if (curr.r >= 2 || curr.r <= -2) return depth;
-    if (depth === colorDepth) return depth;
-
+  let depth = 0;
+  for (; depth < colorDepth; depth++) {
+    if (curr.r >= 2 || curr.r <= -2) break;
     curr = add(square(curr), t);
   }
+
+  return depth;
 }
