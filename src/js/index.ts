@@ -2,10 +2,12 @@ import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb';
 import { mandelbrot, perf } from './utils';
 import { resolution } from './config';
 import { getComplex, initialCanvas, Canvas, zoomOnPosition } from './canvas';
+import './webGL';
 import '../sass/main.sass';
 
 function initGrid(container: HTMLElement) {
   const grid = document.getElementById('grid') as HTMLCanvasElement;
+  if (!grid) return;
   const ctx = grid.getContext('2d') as CanvasRenderingContext2D;
   const gridLength = container.clientWidth;
   grid.setAttribute('width', `${resolution}`);
