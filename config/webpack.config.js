@@ -4,8 +4,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: './src/js/index.ts',
+  mode: "development",
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
+    fallback: { "url": require.resolve("url/") }
   },
   output: {
     filename: 'index.js',

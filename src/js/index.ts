@@ -2,7 +2,7 @@ import { colorDepth, getRGBFromPercentage, RGBValue } from './rgb';
 import { mandelbrot, perf } from './utils';
 import { resolution } from './config';
 import { getComplex, initialCanvas, Canvas, zoomOnPosition } from './canvas';
-import './webGL';
+import './webGPU';
 import '../sass/main.sass';
 
 function initGrid(container: HTMLElement) {
